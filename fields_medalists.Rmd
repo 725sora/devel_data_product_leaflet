@@ -1,0 +1,39 @@
+---
+title: "Fields Medalists by Countries"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, echo=FALSE, include=FALSE}
+library(dplyr)
+library(leaflet)
+library(maps)
+```
+
+The Fields Medal is a prize for few people every four years for their outstanding research results in mathematics. The following figure shows the distribution of the winners by nations, based on the data of https://stats.areppim.com/stats/stats_fieldsxnation.htm. (Status: 2021-03-08)
+
+The markers show the number of the Fields Medalist in each country, the pop-ups the name of the country respectively.
+
+```{r, echo=FALSE}
+f_medalists <- read.csv("f_medalists.csv", header = FALSE)
+names(f_medalists) <- c("country", "awards")
+```
+
+```{r, echo=FALSE, wessage=FALSE}
+f_medal <- world.cities %>% 
+  filter(capital == 1) %>% 
+  dplyr::select(country = country.etc, lat, lng = long) %>% 
+  left_join(f_medalists, ., by = "country")
+```
+
+```{r, echo=FALSE, message=FALSE}
+f_medal <- f_medal %>%
+  leaflet(width = "100%") %>% 
+  addTiles() %>%
+  addMarkers(label = ~awards, popup = ~ country)
+f_medal
+```
+
